@@ -2,7 +2,14 @@
 name = "rs-masscode"
 version = "0.1.0"
 edition = "2021"
-
+authors = ["ZackaryW"]
+rust-version = "1.64.0"
+documentation = "https://github.com/ZackaryW/rs-masscode"
+readme = "README.md"
+repository = "https://github.com/ZackaryW/rs-masscode"
+license = "MIT"
+description = "rust wrapper for masscode"
+keywords = ["masscode", "cli", "nom-query"]
 
 [dependencies]
 serde = { version = "1.0.198", features = ["derive"] }
@@ -16,3 +23,4 @@ path = "src/main.rs"
 
 [dev-dependencies]
 clap = "4.5.3"
+
