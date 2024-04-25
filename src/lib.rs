@@ -119,93 +119,33 @@ impl Loader {
         Ok(())
     }
 
-    
     pub fn query_folders(&mut self, query: &str) -> Vec<model::FolderModel> {
-        // Attempt to retrieve the storage data, handle potential errors
-        let data = match self.db_content() {
-            Ok(data) => data,
-            Err(_) => return Vec::new(), // Return an empty vector if there's an error loading the data
-        };
-
-        let mut result = Vec::new();
-
-        // Parse the query, handle errors
-        match query::parse_query(query) {
-            Ok(query_exp) => {
-                // Iterate through folders and evaluate each one against the parsed query expression
-                for (_, folder) in data.folders.iter() {
-                    // Ensure the evaluate function is correctly handling &Expr and &FolderModel
-                    if query::evaluate(&query_exp.1, folder) {
-                        result.push(folder.clone());
-                    }
-                }
-            },
-            Err(_) => {
-                // Handle parse errors, perhaps logging them or simply returning an empty vector
-                return Vec::new();
-            }
-        }
-
-        result
-    }
-
-    pub fn query_snippets(&mut self, query: &str) -> Vec<model::SnippetModel> {
-        // Attempt to retrieve the storage data, handle potential errors
-        let data = match self.db_content() {
-            Ok(data) => data,
-            Err(_) => return Vec::new(), // Return an empty vector if there's an error loading the data
-        };
-
-        let mut result = Vec::new();
-
-        // Parse the query, handle errors
-        match query::parse_query(query) {
-            Ok(query_exp) => {
-                // Iterate through folders and evaluate each one against the parsed query expression
-                for (_, folder) in data.snippets.iter() {
-                    // Ensure the evaluate function is correctly handling &Expr and &FolderModel
-                    if query::evaluate(&query_exp.1, folder) {
-                        result.push(folder.clone());
-                    }
-                }
-            },
-            Err(_) => {
-                //log   
-                return Vec::new();
-
-            }
-        }
-
-        result
+        let db = self.db_content().unwrap();
+        let queryexp = query::parse_query(query);
+        let queryres = &queryexp.unwrap().1;
+        let folders = &db.folders.clone();
+        let res = query::execute_query(folders, queryres);
+        res.unwrap()
     }
 
     pub fn query_tags(&mut self, query: &str) -> Vec<model::TagModel> {
-        // Attempt to retrieve the storage data, handle potential errors
-        let data = match self.db_content() {
-            Ok(data) => data,
-            Err(_) => return Vec::new(), // Return an empty vector if there's an error loading the data
-        };
-
-        let mut result = Vec::new();
-
-        // Parse the query, handle errors
-        match query::parse_query(query) {
-            Ok(query_exp) => {
-                // Iterate through folders and evaluate each one against the parsed query expression
-                for (_, folder) in data.tags.iter() {
-                    // Ensure the evaluate function is correctly handling &Expr and &FolderModel
-                    if query::evaluate(&query_exp.1, folder) {
-                        result.push(folder.clone());
-                    }
-                }
-            },
-            Err(_) => {
-                // Handle parse errors, perhaps logging them or simply returning an empty vector
-                return Vec::new();
-            }
-        }
-
-        result
+        let db = self.db_content().unwrap();
+        let queryexp = query::parse_query(query);
+        let queryres = &queryexp.unwrap().1;
+        let tags = &db.tags.clone();
+        let res = query::execute_query(tags, queryres);
+        res.unwrap()
     }
+
+    pub fn query_snippets(&mut self, query: &str) -> Vec<model::SnippetModel> {
+        let db = self.db_content().unwrap();
+        let queryexp = query::parse_query(query);
+        let queryres = &queryexp.unwrap().1;
+        let snippets = &db.snippets.clone();
+        let res = query::execute_query(snippets, queryres);
+        res.unwrap()
+    }
+
 }
+
 

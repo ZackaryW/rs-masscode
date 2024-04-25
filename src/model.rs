@@ -1,5 +1,6 @@
 use serde::{Serialize, Deserialize};
 use std::collections::HashMap;
+use serde;
 
 #[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -33,6 +34,7 @@ pub struct SnippetModel {
     pub createdAt: i64,
     pub updatedAt: i64,
     pub tagsIds: Vec<String>,
+    #[serde(skip_serializing)]
     pub content: Vec<Content>,
     pub id: String,
 }
@@ -53,4 +55,3 @@ pub struct StorageData {
     pub tags: HashMap<String, TagModel>,
     pub snippets: HashMap<String, SnippetModel>,
 }
-

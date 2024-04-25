@@ -94,7 +94,7 @@ fn condition(input: &str) -> IResult<&str, Expr> {
     alt((
         // Handle one_of condition separately
         map(
-            tuple((field, multispace1, tag("@oo"), multispace1, value_list)),
+            tuple((field, multispace1, tag("@OO"), multispace1, value_list)),
             |(f, _, _, _, vals)| Expr::Condition(f, Operator::OneOf, vals),
         ),
         // Normal conditions
@@ -138,29 +138,84 @@ pub fn parse_query(input: &str) -> IResult<&str, Expr> {
     logical_expr(input) // Assuming this is your top-level parsing function
 }
 
-pub fn execute_query(data: &HashMap<String, HashMap<String, String>>, expr: &Expr) -> Vec<String> {
+pub fn execute_query<T: serde::Serialize + Clone>(
+    data: &HashMap<String, T>,
+    expr: &Expr,
+) -> Result<Vec<T>, serde_json::Error> {
     data.iter()
-        .filter_map(|(key, values)| if evaluate(expr, values) { Some(key.clone()) } else { None })
+        .filter_map(|(_key, value)| {
+            // Serialize the value to a JSON Value for evaluation.
+            let json_value = serde_json::to_value(value);
+            match json_value {
+                Ok(val) => {
+                    // If the expression evaluates true, return the original object.
+                    if evaluate(expr, &val) {
+                        Some(Ok(value.clone()))  // Cloning the value if it meets the condition.
+                    } else {
+                        None
+                    }
+                }
+                Err(e) => Some(Err(e)),  // Return error during serialization
+            }
+        })
+        // Collect results and propagate serialization errors.
         .collect()
 }
 
-pub(crate) fn evaluate<T: serde::Serialize>(expr: &Expr, item: &T) -> bool {
-    // Serialize the item into serde_json::Value to access fields dynamically
-    let value = serde_json::to_value(item).unwrap();
 
+pub(crate) fn evaluate(expr: &Expr, item: &serde_json::Value) -> bool {
     match expr {
         Expr::Condition(field, operator, values) => {
-            if let Some(value) = value.get(field).and_then(|v| v.as_str()) {
+            if let Some(value) = item.get(field) {
                 match operator {
-                    Operator::Eq => values.contains(&value.to_string()),
-                    Operator::Gt => value > &values[0],
-                    Operator::Lt => value < &values[0],
-                    Operator::Gte => value >= &values[0],
-                    Operator::Lte => value <= &values[0],
-                    Operator::StartsWith => value.starts_with(&values[0]),
-                    Operator::EndsWith => value.ends_with(&values[0]),
-                    Operator::Contains => value.contains(&values[0]),
-                    Operator::OneOf => values.iter().any(|v| v == value),
+                    Operator::Eq => values.iter().any(|v| value == &serde_json::Value::String(v.clone())),
+                    Operator::Gt | Operator::Lt | Operator::Gte | Operator::Lte => {
+                        if let Some(val_str) = value.as_str() {
+                            values.iter().any(|v| {
+                                let value_num: f64 = val_str.parse().unwrap_or(f64::NAN);
+                                let target_num: f64 = v.parse().unwrap_or(f64::NAN);
+                                match operator {
+                                    Operator::Gt => value_num > target_num,
+                                    Operator::Lt => value_num < target_num,
+                                    Operator::Gte => value_num >= target_num,
+                                    Operator::Lte => value_num <= target_num,
+                                    _ => false,
+                                }
+                            })
+                        } else {
+                            false
+                        }
+                    },
+                    Operator::StartsWith => {
+                        values.iter().any(|v| {
+                            if let Some(val_str) = value.as_str() {
+                                val_str.starts_with(v)
+                            } else {
+                                false
+                            }
+                        })
+                    },
+                    Operator::EndsWith => {
+                        values.iter().any(|v| {
+                            if let Some(val_str) = value.as_str() {
+                                val_str.ends_with(v)
+                            } else {
+                                false
+                            }
+                        })
+                    },
+                    Operator::Contains => {
+                        values.iter().any(|v| {
+                            if let Some(val_str) = value.as_str() {
+                                val_str.contains(v)
+                            } else {
+                                false
+                            }
+                        })
+                    },
+                    Operator::OneOf => {
+                        values.iter().any(|v| &serde_json::Value::String(v.clone()) == value)
+                    },
                 }
             } else {
                 false
