@@ -1,22 +1,24 @@
 # rs-masscode
-rust wrapper for masscode
+rust written middleware for masscode
 
-this is both a library and a cli for masscode
-
-## CLI
+## Install
+```bash
+cargo install rs-masscode
 ```
--q, --query [<QUERY>...]  Query to use for filtering results
-    --all                 Returns a dictionary copy of everything
-    --folders             Returns list of folders
-    --tags                Returns list of tags
-    --snippets            Returns list of snippets
-    --id                  Return only a list of ids
-    --content             Returns the content of a snippet
--h, --help                Print help
--V, --version             Print version
+## Features
+- query items using v8_mini engine
+- subqueries (WIP)
+- add new entries (WIP)
+
+> WIP - work in progress
+
+## Usage
+### Binary
+```bash
+rsmasscode query snippet "v8 query"
+rsmasscode query folder "v8 query"
+rsmasscode query tag "v8 query"
 ```
 
 ## Additional Info
-available via [rep](https://github.com/ZackaryW/rs-masscode)
-
-
+[repo link](https://github.com/ZackaryW/rs-masscode)

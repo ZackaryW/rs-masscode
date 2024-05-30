@@ -2,25 +2,18 @@
 name = "rs-masscode"
 version = "0.1.0"
 edition = "2021"
-authors = ["ZackaryW"]
-rust-version = "1.64.0"
-documentation = "https://github.com/ZackaryW/rs-masscode"
-readme = "README.md"
-repository = "https://github.com/ZackaryW/rs-masscode"
-license = "MIT"
-description = "rust wrapper for masscode"
-keywords = ["masscode", "cli", "nom-query"]
 
 [dependencies]
-serde = { version = "1.0.198", features = ["derive"] }
-serde_json = "1.0.116"
-nom = "7.1.0"
-clap = { version = "4.5.3"}
+mini-v8 = "0.4.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+clap = "4.5"
 
 [[bin]]
-name = "rsmasscode"
-path = "src/main.rs"
+name = "rsmasscode" 
+path = "src/main.rs" 
 
-[dev-dependencies]
-clap = "4.5.3"
-
+# Library target configuration
+[lib]
+name = "rs_masscode" 
+path = "src/lib.rs" 
