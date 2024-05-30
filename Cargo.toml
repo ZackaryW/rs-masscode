@@ -1,7 +1,10 @@
 [package]
 name = "rs-masscode"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
+description = "rs-masscode is a command line tool and library for masscode (querying)"
+license = "MIT"
+readme = "README.md"
 
 [dependencies]
 mini-v8 = "0.4.1"
