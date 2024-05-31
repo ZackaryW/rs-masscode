@@ -7,7 +7,7 @@ cargo install rs-masscode
 ```
 ## Features
 - query items using v8_mini engine
-- subqueries (WIP)
+- subqueries and return only ids
 - add new entries (WIP)
 
 > WIP - work in progress
@@ -15,7 +15,7 @@ cargo install rs-masscode
 ## Usage
 ### Binary
 ```bash
-rsmasscode query snippet "v8 query"
+rsmasscode query snippet "v8 query" [-i] [-f folder query] [-t tag query]
 rsmasscode query folder "v8 query"
 rsmasscode query tag "v8 query"
 ```

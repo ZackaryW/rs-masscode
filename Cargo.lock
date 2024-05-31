@@ -190,7 +190,7 @@ dependencies = [
 
 [[package]]
 name = "rs-masscode"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "clap",
  "mini-v8",
